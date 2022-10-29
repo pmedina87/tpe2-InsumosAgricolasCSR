@@ -66,7 +66,7 @@ class ApiInsumoController extends Controller {
         // }
         else {
             $id = $this->model->add($insumo->insumo, $insumo->unidad_medida, $insumo->id_tipo_insumo);
-            $this->view->response("El insumo se agrego con éxito con el id= $id", 201);
+            $this->view->response("El insumo se agrego con exito, con el id= $id", 201);
         }
     }
     
