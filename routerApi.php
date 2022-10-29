@@ -8,6 +8,10 @@ $router = new Router();
 
 // defino la tabla de ruteo
 $router->addRoute('insumos', 'GET', 'ApiInsumoController', 'getInsumos');
+$router->addRoute('insumos/:ID', 'GET', 'ApiInsumoController', 'getInsumo');
+$router->addRoute('insumos/:ID', 'DELETE', 'ApiInsumoController', 'deleteInsumo');
+$router->addRoute('insumos', 'POST', 'ApiInsumoController', 'addInsumo');
+$router->addRoute('insumos/:ID', 'PUT', 'ApiInsumoController', 'updateInsumo');
 
 
 // ejecuta la ruta (sea cual sea)
