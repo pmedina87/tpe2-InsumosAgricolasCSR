@@ -1,0 +1,26 @@
+li span {
+    font-weight: bold;
+}
+
+img{
+    margin: auto;
+    margin-top: 15px;
+    display: block;
+    width: 450px;
+    height: 450px;
+    }
+
+.tabla {
+    text-align: center;
+    width: 80%;
+}
+
+.login-form{
+    border-radius: 15px;
+    margin-top: 50px;
+    margin-left: 500px;
+    padding: 15px;
+    background: #6c757d;
+    width: 350px;
+    height: 350px;
+}
