@@ -4,6 +4,10 @@ require_once 'model.php';
 
 class TipoInsumoModel extends Model {
 
+     function __construct() {
+       parent::__construct();
+    }
+
     /**
      * Consulta para mostrar todos los tipos de insumos
      */
