@@ -1,16 +1,19 @@
 <?php
 
+require_once './app/models/model.php';
+
 class InsumoModel extends Model {
+
+    function __construct() {
+       parent::__construct();
+    }
 
     /**
      * Consulta para mostrar todos los insumos
      */
     function getAll(){
-        //2. preparamos la consulta
-        // $query = $this->db->prepare("SELECT * FROM insumo");
         $query = $this->db->prepare("SELECT id_insumo, insumo, unidad_medida, id_tipo_insumo FROM insumo");
         $query->execute();
-        // $insumos = $query->fetchAll(PDO::FETCH_ASSOC);
         $insumos = $query->fetchAll(PDO::FETCH_OBJ);
         return $insumos;
     }
