@@ -2,7 +2,7 @@
 
 class Model {
 
-    private $db;
+    protected $db;
 
     /**
      * Constructor de la clase tipoInsumoModel
@@ -16,7 +16,7 @@ class Model {
      * Conexion a base de datos
      * Funcion privada para que nadie (que no este dentro de la misma clase), pueda acceder
      */
-    private function connection(){
+    public function connection(){
         $db = new PDO('mysql:host=localhost;'.'dbname=db_insumos_agricolas;charset=utf8', 'root', '');
         return $db;
     }
