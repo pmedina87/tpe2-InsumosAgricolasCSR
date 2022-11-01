@@ -16,11 +16,62 @@ class ApiInsumoController extends Controller {
     }
     
     /**
-     * Funcion que devuelve todos los insumos
+     * Funcion que devuelve todos los insumos o algunos, si se agregan parametos
      */
-    public function getInsumos($params = null) {
-        $insumos = $this->model->getAll();
-        $this->view->response($insumos);
+    public function getInsumos($params = null){
+        if(isset($_GET['inicio']) && isset($_GET['registros']) && is_numeric($_GET['inicio']) && is_numeric($_GET['registros'])){
+            $insumos = $this->model->getAll();
+            $inicio = $_GET['inicio'];
+            if(count($insumos) < $inicio || $inicio < 0){
+                $this->view->response("Error: ingreso un inicio que es superior al numero de registros o un valor de inicio negativo", 404);
+            }else{
+                $insumos = $this->model->getPage($_GET['inicio'], $_GET['registros']);
+                $this->view->response($insumos);
+            }    
+        }
+        elseif(isset($_GET['insumo']) && count($_GET) == 2){
+            $insumos = $this->model->getInsumosNombre($_GET['insumo']);
+            if(count($insumos) > 0){
+                $this->view->response($insumos); 
+            }else{
+                $this->view->response("No hay registros para mostrar", 404);
+            }
+        }
+        elseif(isset($_GET['unidadMedida']) && count($_GET) == 2){
+            $insumos = $this->model->getInsumosUnidadMedida($_GET['unidadMedida']);
+            if (count($insumos) > 0) {
+                $this->view->response($insumos);
+            } else {
+                $this->view->response("No hay registros para mostrar", 404);
+            }     
+        }
+        elseif(isset($_GET['tipoDeInsumo']) && count($_GET) == 2){
+            $insumos = $this->model->getInsumosTiposInsumos($_GET['tipoDeInsumo']);
+            if (count($insumos) > 0) {
+                $this->view->response($insumos);
+            } else {
+                $this->view->response("No hay registros para mostrar", 404);
+            }     
+        }
+        elseif(isset($_GET['sortBy']) && isset($_GET['order']) && count($_GET) == 3){
+            if(($_GET['sortBy'] == 'insumo' || $_GET['sortBy'] == 'unidad_medida' || $_GET['sortBy'] == 'id_insumo' || $_GET['sortBy'] == 'id_tipo_insumo') && ($_GET['order'] == 'asc' || $_GET['order'] == 'desc')){
+                $insumos = $this->model->getInsumosOrder($_GET['sortBy'], $_GET['order']);
+                if (count($insumos) > 0) {
+                    $this->view->response($insumos);
+                } else {
+                    $this->view->response("No hay insumos para mostrar", 404);
+                }
+            }else{
+                $this->view->response("El campo o la forma a ordenar, no existe", 404);
+            }     
+        } 
+        elseif (count($_GET) == 1){
+            $insumos = $this->model->getAll();
+            $this->view->response($insumos);            
+        }
+        else{
+            $this->view->response("El recurso no existe", 404);
+        }
     }
 
     /**
