@@ -14,61 +14,92 @@ class ApiInsumoController extends Controller {
         parent::__construct();
         $this->model = new InsumoModel();
     }
-    
-    /**
-     * Funcion que devuelve todos los insumos o algunos, si se agregan parametos
-     */
-    public function getInsumos($params = null){
-        if(isset($_GET['inicio']) && isset($_GET['registros']) && is_numeric($_GET['inicio']) && is_numeric($_GET['registros'])){
-            $insumos = $this->model->getAll();
-            $inicio = $_GET['inicio'];
-            if(count($insumos) < $inicio || $inicio < 0){
-                $this->view->response("Error: ingreso un inicio que es superior al numero de registros o un valor de inicio negativo", 404);
-            }else{
-                $insumos = $this->model->getPage($_GET['inicio'], $_GET['registros']);
-                $this->view->response($insumos);
-            }    
-        }
-        elseif(isset($_GET['insumo']) && count($_GET) == 2){
-            $insumos = $this->model->getInsumosNombre($_GET['insumo']);
-            if(count($insumos) > 0){
-                $this->view->response($insumos); 
-            }else{
-                $this->view->response("No hay registros para mostrar", 404);
+
+    private function getSuppliesSortByAndOrder($sortBy, $order){
+        if (($sortBy == 'insumo' || $sortBy == 'unidad_medida' || $sortBy == 'id_insumo' || $sortBy == 'id_tipo_insumo') && ($order == 'asc' || $order == 'desc')) {
+            $supplies = $this->model->getSupplieOrder($sortBy, $order);
+            if (count($supplies) > 0) {
+                $this->view->response($supplies);
+            } else {
+                $this->view->response("No hay insumos para mostrar", 404);
             }
-        }
-        elseif(isset($_GET['unidadMedida']) && count($_GET) == 2){
-            $insumos = $this->model->getInsumosUnidadMedida($_GET['unidadMedida']);
-            if (count($insumos) > 0) {
-                $this->view->response($insumos);
-            } else {
-                $this->view->response("No hay registros para mostrar", 404);
-            }     
-        }
-        elseif(isset($_GET['tipoDeInsumo']) && count($_GET) == 2){
-            $insumos = $this->model->getInsumosTiposInsumos($_GET['tipoDeInsumo']);
-            if (count($insumos) > 0) {
-                $this->view->response($insumos);
-            } else {
-                $this->view->response("No hay registros para mostrar", 404);
-            }     
-        }
-        elseif(isset($_GET['sortBy']) && isset($_GET['order']) && count($_GET) == 3){
-            if(($_GET['sortBy'] == 'insumo' || $_GET['sortBy'] == 'unidad_medida' || $_GET['sortBy'] == 'id_insumo' || $_GET['sortBy'] == 'id_tipo_insumo') && ($_GET['order'] == 'asc' || $_GET['order'] == 'desc')){
-                $insumos = $this->model->getInsumosOrder($_GET['sortBy'], $_GET['order']);
-                if (count($insumos) > 0) {
-                    $this->view->response($insumos);
-                } else {
-                    $this->view->response("No hay insumos para mostrar", 404);
-                }
-            }else{
-                $this->view->response("El campo o la forma a ordenar, no existe", 404);
-            }     
+        } else {
+            $this->view->response("El campo o la forma a ordenar, no existe", 404);
+        }  
+    }
+    private function getSuppliesTypeOfSupplie($typeOfSupplie){
+        $supplies = $this->model->getSuppliesTypeOfSupplie($typeOfSupplie);
+        if (count($supplies) > 0) {
+            $this->view->response($supplies);
+        } else {
+            $this->view->response("No hay registros para mostrar", 404);
         } 
-        elseif (count($_GET) == 1){
-            $insumos = $this->model->getAll();
-            $this->view->response($insumos);            
+    }
+
+    private function getSuppliesUnitOfMeasurement ($unitOfMeasurement){
+        $supplies = $this->model->getSuppliesUnitOfMeasurement($unitOfMeasurement);
+        if (count($supplies) > 0) {
+            $this->view->response($supplies);
+        } else {
+            $this->view->response("No hay registros para mostrar", 404);
+        }    
+    }
+    
+    private function getSupplieForName($supplie){
+        $supplies = $this->model->getSuppliesName($supplie);
+        if (count($supplies) > 0) {
+            $this->view->response($supplies);
+        } else {
+            $this->view->response("No hay registros para mostrar", 404);
         }
+    }
+
+    private function getPagination($start, $limit) {
+        $supplies = $this->model->getAll();
+        if (count($supplies) < $start || $start < 0) {
+            $this->view->response("Error: ingreso un inicio que es superior al numero de registros o un valor de inicio negativo", 404);
+        } else {
+            $supplies = $this->model->getPagination($start, $limit);
+            $this->view->response($supplies);
+        }
+    }
+
+    /**
+     * Funcion que devuelve todos los insumos o algunos, si se agregan parametros
+     */
+    public function getSupplies($params = null){
+        if(isset($_GET['start']) && isset($_GET['records']) && is_numeric($_GET['start']) && is_numeric($_GET['records'])){
+            $start = $_GET['start'];
+            $limit = $_GET['records'];
+            $this->getPagination($start, $limit);   
+        }
+
+        elseif(isset($_GET['supplie']) && count($_GET) == 2){ //con count controlo que reciba solo dos parametros, para que no se vaya por otra rama del elseif
+            $supplie = $_GET['supplie'];
+            $this->getSupplieForName($supplie);
+        }
+
+        elseif(isset($_GET['unidadMedida']) && count($_GET) == 2){
+            $unitOfMeasurement = $_GET['unidadMedida'];
+            $this->getSuppliesUnitOfMeasurement($unitOfMeasurement);   
+        }
+
+        elseif(isset($_GET['tipoDeInsumo']) && count($_GET) == 2){ 
+            $typeOfSupplie = $_GET['tipoDeInsumo']; 
+            $this->getSuppliesTypeOfSupplie($typeOfSupplie);    
+        }
+
+        elseif(isset($_GET['sortBy']) && isset($_GET['order']) && count($_GET) == 3){ //con count controlo que reciba solo dos parametros, para que no se vaya por otra rama del elseif
+            $sortBy = $_GET['sortBy'];
+            $order = $_GET['order'];
+            $this->getSuppliesSortByAndOrder($sortBy, $order);   
+        } 
+
+        elseif (count($_GET) == 1){
+            $supplies = $this->model->getAll();
+            $this->view->response($supplies);            
+        }
+
         else{
             $this->view->response("El recurso no existe", 404);
         }
@@ -77,11 +108,11 @@ class ApiInsumoController extends Controller {
     /**
      * Funcion que devuelve un insumo especifico, determinado por el ID recibido
      */
-    public function getInsumo($params = null) {
+    public function getSupplie($params = null) {
         $id = $params[':ID']; //capturo ID
-        $insumo = $this->model->get($id);
-        if ($insumo) {
-            $this->view->response($insumo);
+        $supplie = $this->model->get($id);
+        if ($supplie) {
+            $this->view->response($supplie);
         }
         else {
              $this->view->response("El insumo con el id= $id no existe", 404);
@@ -91,12 +122,12 @@ class ApiInsumoController extends Controller {
     /**
     * Funcion que elimina un insumo especifico, determinado por el ID recibido
     */
-    public function deleteInsumo($params = null){
+    public function deleteSupplie($params = null){
         $id = $params[':ID']; //capturo ID
-        $insumo = $this->model->get($id);
-        if ($insumo) {
+        $supplie = $this->model->get($id);
+        if ($supplie) {
             $this->model->delete($id);
-            $this->view->response($insumo);  
+            $this->view->response($supplie);  
         }
         else {
             $this->view->response("El insumo con el id= $id no existe", 404);
@@ -106,17 +137,16 @@ class ApiInsumoController extends Controller {
     /**
      * Funcion que agrega/inserta un nuevo insumo
      */
-    public function addInsumo($params = null){
-        $insumo = $this->getData();
-
-        if ((empty($insumo->insumo)) || (empty($insumo->unidad_medida)) || (empty($insumo->id_tipo_insumo))){
+    public function addSupplie($params = null){
+        $supplie = $this->getData();
+        $nameSupplie = $supplie->insumo;
+        $unitOfMeasurement = $supplie->unidad_medida;
+        $typeOfSupplie = $supplie->id_tipo_insumo;
+        if ((empty($nameSupplie)) || (empty($unitOfMeasurement)) || (empty($typeOfSupplie))){
             $this->view->response("Debe completar todos los datos requeridos", 400);
         }
-        // if ((empty($insumo->insumo) || isset($insumo->insumo)) || (empty($insumo->unidad_medida) || isset($insumo->unidad_medida)) || (empty($insumo->id_tipo_insumo) || isset($insumo->id_tipo_insumo))){
-        //     $this->view->response("Debe completar todos los datos requeridos", 400);
-        // }
         else {
-            $id = $this->model->add($insumo->insumo, $insumo->unidad_medida, $insumo->id_tipo_insumo);
+            $id = $this->model->add($nameSupplie, $unitOfMeasurement, $typeOfSupplie);
             $this->view->response("El insumo se agrego con exito, con el id= $id", 201);
         }
     }
@@ -124,15 +154,19 @@ class ApiInsumoController extends Controller {
     /**
      * Funcion que edita un insumo especifico, determinado por el ID recibido
      */
-    public function updateInsumo($params = null) {
+    public function updateSupplie($params = null) {
         $id = $params[':ID']; //capturo ID
-        $insumo = $this->getData();
-        if ((empty($insumo->insumo)) || (empty($insumo->unidad_medida)) || (empty($insumo->id_tipo_insumo))){
+        $supplie = $this->getData();
+        $idSupplie = $supplie->id_insumo;
+        $nameSupplie = $supplie->insumo;
+        $unitOfMeasurement = $supplie->unidad_medida;
+        $typeOfSupplie = $supplie->id_tipo_insumo;
+        if ((empty($nameSupplie)) || (empty($unitOfMeasurement)) || (empty($typeOfSupplie))){
             $this->view->response("Debe completar todos los datos requeridos", 400);
         }
         else{
-            $this->model->update($insumo->id_insumo, $insumo->insumo, $insumo->unidad_medida, $insumo->id_tipo_insumo);
-            $this->view->response("El insumo con el ID= $id se actualizo con exito", 204);
+            $this->model->update($idSupplie, $nameSupplie, $unitOfMeasurement, $typeOfSupplie);
+            $this->view->response("El insumo con el ID= $idSupplie se actualizo con exito", 204);
         }
     }
 }
