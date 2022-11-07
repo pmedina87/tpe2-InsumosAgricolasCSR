@@ -9,13 +9,33 @@ class TipoInsumoModel extends Model {
     }
 
     /**
+     * Muestra una pagina especifica de XX registros
+     */
+    public function getPage($inicio, $registros)
+    {
+        $this->db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        $query = $this->db->prepare("SELECT * FROM tipo_insumo LIMIT ?, ?");
+        // $query->execute(array(intval($inicio), intval($limite)));
+        $query->execute([$inicio, $registros]);
+        return $query->fetchAll(PDO::FETCH_OBJ);
+    }
+
+    /**
      * Consulta para mostrar todos los tipos de insumos
      */
     public function getAll(){
         $query = $this->db->prepare("SELECT * FROM tipo_insumo");
         $query->execute();
-        $tiposInsumos = $query->fetchAll(PDO::FETCH_OBJ);
-        return $tiposInsumos;
+        return $query->fetchAll(PDO::FETCH_OBJ);
+    }
+
+    /**
+     * Consulta para mostrar todos los id de tipos de insumos
+     */
+    public function getAllId(){
+        $query = $this->db->prepare("SELECT id_tipo_insumo FROM tipo_insumo");
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
     /**
@@ -24,32 +44,31 @@ class TipoInsumoModel extends Model {
     public function get($id){
         $query = $this->db->prepare("SELECT id_tipo_insumo, tipo_insumo FROM tipo_insumo WHERE id_tipo_insumo = ?");
         $query->execute([$id]);
-        $tipoInsumo = $query->fetch(PDO::FETCH_OBJ);
-        return $tipoInsumo;
+        return $query->fetch(PDO::FETCH_OBJ);
     }
 
     /**
      * Agrega un nuevo Tipo de Insumo
      */
-    public function add($tipo_insumo){
+    public function add($typeOfSupplie){
         $query = $this->db->prepare("INSERT INTO tipo_insumo(tipo_insumo) VALUES (?)");
-        $query->execute([$tipo_insumo]);
+        $query->execute([$typeOfSupplie]);
         return $this->db->lastInsertId();    
     }
 
     /**
      * Elimina un tipo de insumo
      */
-    public function delete($id_tipo_insumo){
+    public function delete($idTypeOfSupplie){
         $query = $this->db->prepare("DELETE FROM tipo_insumo WHERE id_tipo_insumo = ?");
-        $query->execute([$id_tipo_insumo]);   
+        $query->execute([$idTypeOfSupplie]);   
     }
 
     /**
      * Edita un tipo de insumo
      */
-    public function update($id_tipo_insumo, $tipo_insumo){
+    public function update($idTypeOfSupplie, $typeOfSupplie){
         $query = $this->db->prepare("UPDATE tipo_insumo SET tipo_insumo = ? WHERE id_tipo_insumo = ?");
-        $query->execute([$tipo_insumo, $id_tipo_insumo]);   
+        $query->execute([$typeOfSupplie, $idTypeOfSupplie]);   
     }
 }
