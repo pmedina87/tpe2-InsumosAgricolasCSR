@@ -69,7 +69,7 @@ class ApiInsumoController extends Controller {
      */
     public function getSupplies($params = null){
         if(isset($_GET['start']) && isset($_GET['records']) && is_numeric($_GET['start']) && is_numeric($_GET['records'])){
-            $start = $_GET['start'];
+            $start = $_GET['start'] - 1;
             $limit = $_GET['records'];
             $this->getPagination($start, $limit);   
         }
