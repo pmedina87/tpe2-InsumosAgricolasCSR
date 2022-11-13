@@ -1,7 +1,6 @@
 <?php
 require_once './libs/Router.php';
 require_once './app/controllers/controllerApiInsumo.php';
-require_once './app/controllers/controllerApiTipoInsumo.php';
 require_once './app/controllers/controllerApiAuth.php';
 
 
