@@ -2,7 +2,6 @@
 
 require_once './app/controllers/controller.php';
 require_once './app/models/modelUser.php';
-require_once './app/models/modelToken.php';
 require_once './app/helpers/helpersApiAuth.php';
 require_once './app/views/viewApi.php';
 
