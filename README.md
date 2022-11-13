@@ -1,7 +1,7 @@
 ## Pueba con postman
 El endpoint de la API es: http://localhost/web2/tpe2-insumosAgricolasCSR/api/
 
-## Tabla Tipos de insumos
+## Tabla Insumos
 El endpoint de la API es: http://localhost/web2/tpe2-insumosAgricolasCSR/api/insumos
 ## Endpoint Insumos
 Metodo: GET, endpoint api/insumos/ -> lista todos los insumos.
