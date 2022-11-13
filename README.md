@@ -27,23 +27,9 @@ Metodo: PUT, endpoint api/insumos/:ID -> actualiza un registro existente, pasand
     "id_tipo_insumo" : //int
 }.
 
-## Tabla Tipo de Insumos
-El endpoint de la API es: http://localhost/web2/tpe2-insumosAgricolasCSR/api/tiposInsumos
+## Gestion de Token
+El endpoint de la API es: http://localhost/web2/tpe2-insumosAgricolasCSR/api/auth/token
+## Endpoint Auth/Token
 
-## Endpoint Tipos de Insumos
-Metodo: GET, endpoint api/tipoInsumos/ -> lista todos los tipos de insumos.
+Metodo: GET, endpoint api/auth/token -> enviando por parametros de Authorization, del tipo Basic Auth, Username y Password, se puede obtener el token de seguridad, para realizar altas, modificaciones y eliminaciones de registros.
 
-Metodo: GET, endpoint api/tipoInsumos?inicio=0&registros=5 -> lista los tipos de insumos desde la posicion cero (desde el inicio) y la cantidad de registros a mostrar son 5 (segun el ejemplo).
-
-Metodo: DELETE, endpoint api/tipoInsumos/:ID -> elimina el registro con el ID ingresado.
-
-Metodo: POST, endpoint api/tipoInsumos -> agrega un registro nuevo, pasando por el body los datos requeridos.
-{
-    "tipo_insumo" : "" //String
-}.
-
-Metodo: PUT, endpoint api/tipoInsumos/:ID -> actualiza un registro existente, pasando por el body los datos requeridos.
-{
-    "id_tipo_insumo" : , //int
-    "tipo_insumo" : "" //String
-}.
