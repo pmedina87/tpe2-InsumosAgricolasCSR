@@ -1,13 +1,15 @@
 <?php
+require_once './app/controllers/controller.php';
 require_once './app/models/modelInsumo.php';
 require_once './app/models/modelTipoInsumo.php';
-require_once './app/controllers/controller.php';
 require_once './app/views/viewApi.php';
+require_once './app/helpers/helpersApiAuth.php';
 
 class ApiInsumoController extends Controller {
     
     private $modelInsumos;
     private $modelTiposInsumos;
+    private $helpersAuth;
     
     /**
      * Constructor
@@ -16,6 +18,7 @@ class ApiInsumoController extends Controller {
         parent::__construct();
         $this->modelInsumos = new InsumoModel();
         $this->modelTiposInsumos = new TipoInsumoModel();
+        $this->helpersAuth = new ApiAuthHelper();
     }
 
     /**
@@ -121,19 +124,24 @@ class ApiInsumoController extends Controller {
      * Funcion que permite la paginacion de los datos, pasando por parametro, la pagina y la cantidad de registros.  
      */
     private function getPaginationForPage($page, $records){
-        $supplies = $this->modelInsumos->getAll();
-        $countSupplies = count($supplies);
-        $pages = $countSupplies / $records;
-        $start = $page * $records;
-        if($pages >= $page){
-            $result = array();
-            for ($i=$start-$records; $i < $start; $i++) { 
-                array_push($result, $supplies[$i]); 
+        if($page > 0){
+            $supplies = $this->modelInsumos->getAll();
+            $countSupplies = count($supplies);
+            $pages = $countSupplies / $records;
+            $start = $page * $records;
+            if($pages >= $page){
+                $result = array();
+                for ($i=$start-$records; $i < $start; $i++) { 
+                    array_push($result, $supplies[$i]); 
+                }
+                $this->view->response($result);
             }
-            $this->view->response($result);
+            else{
+                $this->view->response("Error: la cantidad de paginas o registros no alcanzan con el requerimiento solicitado", 404); 
+            }
         }
-        else{
-            $this->view->response("Error: no hay suficientes paginas para mostrar", 404); 
+        else {
+            $this->view->response("Error: la cantidad de paginas debe ser mayor o igual a 1", 404);
         }
     }
 
@@ -202,14 +210,19 @@ class ApiInsumoController extends Controller {
     * Funcion que elimina un insumo especifico, determinado por el ID recibido
     */
     public function deleteSupplie($params = null){
-        $id = $params[':ID']; //capturo ID
-        $supplie = $this->modelInsumos->get($id);
-        if ($supplie) {
-            $this->modelInsumos->delete($id);
-            $this->view->response($supplie);  
+        if ($this->helpersAuth->isLoggedIn()){
+            $id = $params[':ID']; //capturo ID
+            $supplie = $this->modelInsumos->get($id);
+            if ($supplie) {
+                $this->modelInsumos->delete($id);
+                $this->view->response($supplie);  
+            }
+            else {
+                $this->errorIdSupplieInsert($id);
+            }
         }
         else {
-            $this->errorIdSupplieInsert($id);
+            $this->view->response("Error de autenticacion", 401);
         }
     }
 
@@ -217,21 +230,29 @@ class ApiInsumoController extends Controller {
      * Funcion que agrega/inserta un nuevo insumo
      */
     public function addSupplie($params = null){
-        $supplie = $this->getData();
-        $nameSupplie = $supplie->insumo;
-        $unitOfMeasurement = $supplie->unidad_medida;
-        $typeOfSupplie = $supplie->id_tipo_insumo;
-        if ((empty($nameSupplie)) || (empty($unitOfMeasurement)) || (empty($typeOfSupplie))){
-            $this->view->response("Debe completar todos los datos requeridos", 400);
-        } 
-        
-        elseif ($this->checkIdTypeOfSupplie($typeOfSupplie)) {
-            $this->errorIdTypeOfSupplieInsert();
-        }
+        if ($this->helpersAuth->isLoggedIn()) {
+            $supplie = $this->getData();
+            $countElem = count((array)$supplie);
+            if($countElem == 3 && isset($supplie->insumo) && isset($supplie->unidad_medida) && isset($supplie->id_tipo_insumo)){
+                $nameSupplie = $supplie->insumo;
+                $unitOfMeasurement = $supplie->unidad_medida;
+                $typeOfSupplie = $supplie->id_tipo_insumo;
 
+                if ($this->checkIdTypeOfSupplie($typeOfSupplie)) {
+                    $this->errorIdTypeOfSupplieInsert();
+                }
+
+                else {
+                    $id = $this->modelInsumos->add($nameSupplie, $unitOfMeasurement, $typeOfSupplie);
+                    $this->view->response("El insumo se agrego con exito, con el id= $id", 201);
+                }
+            }
+            else {
+                $this->view->response("Debe completar todos los datos requeridos", 400);
+            }
+        } 
         else {
-            $id = $this->modelInsumos->add($nameSupplie, $unitOfMeasurement, $typeOfSupplie);
-            $this->view->response("El insumo se agrego con exito, con el id= $id", 201);
+            $this->view->response("Error de autenticacion", 401);
         }
     }
     
@@ -239,22 +260,29 @@ class ApiInsumoController extends Controller {
      * Funcion que edita un insumo especifico, determinado por el ID recibido
      */
     public function updateSupplie($params = null) {
-        $supplie = $this->getData();
-        $idSupplie = $supplie->id_insumo;
-        $nameSupplie = $supplie->insumo;
-        $unitOfMeasurement = $supplie->unidad_medida;
-        $typeOfSupplie = $supplie->id_tipo_insumo;
-        if ((empty($nameSupplie)) || (empty($unitOfMeasurement)) || (empty($typeOfSupplie))){
-            $this->view->response("Debe completar todos los datos requeridos", 400);
-        }
-        
-        elseif($this->checkIdTypeOfSupplie($typeOfSupplie)) {
-            $this->errorIdTypeOfSupplieInsert();
-        }
+        if ($this->helpersAuth->isLoggedIn()) {
+            $supplie = $this->getData();
+            $countElem = count((array)$supplie);
+            if ($countElem == 4 && isset($supplie->id_insumo) && isset($supplie->insumo) && isset($supplie->unidad_medida) && isset($supplie->id_tipo_insumo)) {
+                $idSupplie = $supplie->id_insumo;
+                $nameSupplie = $supplie->insumo;
+                $unitOfMeasurement = $supplie->unidad_medida;
+                $typeOfSupplie = $supplie->id_tipo_insumo;
 
-        else{
-            $this->modelInsumos->update($idSupplie, $nameSupplie, $unitOfMeasurement, $typeOfSupplie);
-            $this->view->response("El insumo con el id= $idSupplie, se actualizo con exito", 204);
+                if ($this->checkIdTypeOfSupplie($typeOfSupplie)) {
+                    $this->errorIdTypeOfSupplieInsert();
+                } 
+                else {
+                    $this->modelInsumos->update($idSupplie, $nameSupplie, $unitOfMeasurement, $typeOfSupplie);
+                    $this->view->response("El insumo con el id= $idSupplie, se actualizo con exito", 204);
+                }
+            } 
+            else {
+                $this->view->response("Debe completar todos los datos requeridos", 400);
+            }
+        } 
+        else {
+            $this->view->response("Error de autenticacion", 401);
         }
     }
 }
