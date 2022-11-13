@@ -17,12 +17,5 @@ $router->addRoute('insumos/:ID', 'PUT', 'ApiInsumoController', 'updateSupplie');
 
 $router->addRoute('auth/token', 'GET', 'ApiAuthController', 'getToken');
 
-
-// $router->addRoute('tiposInsumos', 'GET', 'ApiTipoInsumoController', 'getTiposInsumos');
-// $router->addRoute('tiposInsumos/:ID', 'GET', 'ApiTipoInsumoController', 'getTipoInsumo');
-// $router->addRoute('tiposInsumos/:ID', 'DELETE', 'ApiTipoInsumoController', 'deleteTipoInsumo');
-// $router->addRoute('tiposInsumos', 'POST', 'ApiTipoInsumoController', 'addTipoInsumo');
-// $router->addRoute('tiposInsumos/:ID', 'PUT', 'ApiTipoInsumoController', 'updateTipoInsumo');
-
 // ejecuta la ruta (sea cual sea)
 $router->route($_GET["resource"], $_SERVER['REQUEST_METHOD']);
