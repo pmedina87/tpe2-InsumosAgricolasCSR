@@ -40,7 +40,7 @@ class ApiAuthHelper {
 
     function isLoggedIn(){
         $payload = $this->getUser();
-        if(isset($payload->id)){
+        if(isset($payload->id) && $payload->exp > time()){
             return true;
         }
         else{
