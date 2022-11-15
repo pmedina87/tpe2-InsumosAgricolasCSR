@@ -15,8 +15,7 @@ class ApiInsumoController extends Controller
     /**
      * Constructor
      */
-    public function __construct()
-    {
+    public function __construct(){
         parent::__construct();
         $this->modelInsumos = new InsumoModel();
         $this->modelTiposInsumos = new TipoInsumoModel();
@@ -26,8 +25,7 @@ class ApiInsumoController extends Controller
     /**
      * Funcion que chequea si el Id tipo de insumo ingresado, esta dentro de los que tiene la DB.
      */
-    private function checkIdTypeOfSupplie($typeOfSupplie)
-    {
+    private function checkIdTypeOfSupplie($typeOfSupplie){
         $typesOfSupplies = $this->modelTiposInsumos->get($typeOfSupplie);
         if ($typesOfSupplies == null) {
             return true;
@@ -39,32 +37,28 @@ class ApiInsumoController extends Controller
     /**
      * Funcion que arroja un error que el id tipo de insumo es incorrecto.
      */
-    private function errorIdTypeOfSupplieInsert()
-    {
+    private function errorIdTypeOfSupplieInsert(){
         $this->view->response("El id_tipo_insumo ingresado no es valido.", 400);
     }
 
     /**
      * Funcion que arroja un error que el id de insumo es incorrecto.
      */
-    private function errorIdSupplieInsert($id)
-    {
+    private function errorIdSupplieInsert($id){
         $this->view->response("El insumo con el id= $id no existe", 404);
     }
 
     /**
      * Funcion que muestra un mensje cuando no hya registros para mostrar
      */
-    private function msgNotRegister()
-    {
+    private function msgNotRegister(){
         $this->view->response("No hay registros para mostrar", 404);
     }
 
     /**
      * Funcion que ordena por uno de los campos de la tabla Insumos y los ordena ascendente o descendentemente.
      */
-    private function getSuppliesSortByAndOrder($sortBy, $order)
-    {
+    private function getSuppliesSortByAndOrder($sortBy, $order){
         if (($sortBy == 'insumo' || $sortBy == 'unidad_medida' || $sortBy == 'id_insumo' || $sortBy == 'id_tipo_insumo') && ($order == 'asc' || $order == 'desc')) {
             $supplies = $this->modelInsumos->getSupplieOrder($sortBy, $order);
             if (count($supplies) > 0) {
@@ -80,8 +74,7 @@ class ApiInsumoController extends Controller
     /**
      * Funcion que filtra los insumos por Tipo de Insumo.
      */
-    private function getSuppliesTypeOfSupplie($typeOfSupplie)
-    {
+    private function getSuppliesTypeOfSupplie($typeOfSupplie){
         $supplies = $this->modelInsumos->getSuppliesTypeOfSupplie($typeOfSupplie);
         if (count($supplies) > 0) {
             $this->view->response($supplies);
@@ -93,8 +86,7 @@ class ApiInsumoController extends Controller
     /**
      * Funcion que filtra los insumos por unidad de medida.
      */
-    private function getSuppliesUnitOfMeasurement($unitOfMeasurement)
-    {
+    private function getSuppliesUnitOfMeasurement($unitOfMeasurement){
         $supplies = $this->modelInsumos->getSuppliesUnitOfMeasurement($unitOfMeasurement);
         if (count($supplies) > 0) {
             $this->view->response($supplies);
@@ -106,8 +98,7 @@ class ApiInsumoController extends Controller
     /**
      * Funcion que filtra los insumos por nombre de insumo.
      */
-    private function getSupplieForName($supplie)
-    {
+    private function getSupplieForName($supplie){
         $supplies = $this->modelInsumos->getSuppliesName($supplie);
         if (count($supplies) > 0) {
             $this->view->response($supplies);
@@ -119,8 +110,7 @@ class ApiInsumoController extends Controller
     /**
      * Funcion que permite la paginacion de los datos, pasando por parametro, desde que registro comenzar y la cantidad de registros.  
      */
-    private function getPaginationForCountRecords($start, $records)
-    {
+    private function getPaginationForCountRecords($start, $records){
         $supplies = $this->modelInsumos->getAll();
         if (count($supplies) <= $start || $start < 0) {
             $this->view->response("Error: ingreso un inicio que es superior al numero de registros o un valor de inicio negativo", 404);
@@ -133,8 +123,7 @@ class ApiInsumoController extends Controller
     /**
      * Funcion que permite la paginacion de los datos, pasando por parametro, la pagina y la cantidad de registros.  
      */
-    private function getPaginationForPage($page, $records)
-    {
+    private function getPaginationForPage($page, $records){
         if ($page > 0 && $records > 0) {
             $supplies = $this->modelInsumos->getAll();
             $countSupplies = count($supplies);
@@ -157,8 +146,7 @@ class ApiInsumoController extends Controller
     /**
      * Funcion que devuelve todos los insumos o algunos, si se agregan parametros
      */
-    public function getSupplies($params = null)
-    {
+    public function getSupplies($params = null){
         if (isset($_GET['start']) && isset($_GET['records']) && is_numeric($_GET['start']) && is_numeric($_GET['records'])) {
             $start = $_GET['start'] - 1;
             $records = $_GET['records'];
@@ -191,8 +179,7 @@ class ApiInsumoController extends Controller
     /**
      * Funcion que devuelve un insumo especifico, determinado por el ID recibido
      */
-    public function getSupplie($params = null)
-    {
+    public function getSupplie($params = null){
         $id = $params[':ID']; //capturo ID
         $supplie = $this->modelInsumos->get($id);
         if ($supplie) {
@@ -205,8 +192,7 @@ class ApiInsumoController extends Controller
     /**
      * Funcion que elimina un insumo especifico, determinado por el ID recibido
      */
-    public function deleteSupplie($params = null)
-    {
+    public function deleteSupplie($params = null){
         if ($this->helpersAuth->isLoggedIn()) {
             $id = $params[':ID']; //capturo ID
             $supplie = $this->modelInsumos->get($id);
@@ -224,8 +210,7 @@ class ApiInsumoController extends Controller
     /**
      * Funcion que agrega/inserta un nuevo insumo
      */
-    public function addSupplie($params = null)
-    {
+    public function addSupplie($params = null){
         if ($this->helpersAuth->isLoggedIn()) {
             $supplie = $this->getData();
             $countElem = count((array)$supplie);
@@ -251,8 +236,7 @@ class ApiInsumoController extends Controller
     /**
      * Funcion que edita un insumo especifico, determinado por el ID recibido
      */
-    public function updateSupplie($params = null)
-    {
+    public function updateSupplie($params = null){
         if ($this->helpersAuth->isLoggedIn()) {
             $supplie = $this->getData();
             $countElem = count((array)$supplie);
